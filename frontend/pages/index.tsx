@@ -1,80 +1,95 @@
-import Link from 'next/link';
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
-
+import Link from 'next/link';
 import { AuthLayout } from '../components/AuthLayout';
 import { TextField } from '../components/TextField';
-import formStyles from '../styles/FormControls.module.css';
 import { login } from '../lib/api';
-
-type LoginState = {
-  email: string;
-  password: string;
-  loading: boolean;
-  error: string | null;
-};
+import styles from '../styles/FormControls.module.css';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [state, setState] = useState<LoginState>({
-    email: '',
-    password: '',
-    loading: false,
-    error: null
-  });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setState((prev) => ({ ...prev, loading: true, error: null }));
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
     try {
-      await login(state.email, state.password);
-      await router.push('/home');
+      const data = await login(email, password);
+      localStorage.setItem('user', JSON.stringify(data));
+      router.push('/home');
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unable to sign in.';
-      setState((prev) => ({ ...prev, loading: false, error: message }));
-      return;
+      const message = err instanceof Error ? err.message : 'Login failed';
+      setError(message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <AuthLayout
-      title="Welcome back"
-      subtitle="Sign in to access your personalised analytics workspace."
-    >
-      <form onSubmit={handleSubmit} className={formStyles.form}>
-        <div className={formStyles.stack}>
+    <AuthLayout>
+      <h2 style={{ marginBottom: '24px', fontSize: '24px', color: 'var(--primary-text)' }}>Login</h2>
+      <form onSubmit={handleSubmit} style={{ width: '100%', maxWidth: '400px' }}>
+        <TextField
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="name@company.com"
+          required
+        />
+        <div className={styles.passwordField}>
           <TextField
-            name="email"
-            type="email"
-            label="Email address"
-            placeholder="you@example.com"
-            required
-            value={state.email}
-            onChange={(event) =>
-              setState((prev) => ({ ...prev, email: event.target.value }))
-            }
-          />
-          <TextField
-            name="password"
-            type="password"
             label="Password"
-            placeholder="Enter your password"
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
-            value={state.password}
-            onChange={(event) =>
-              setState((prev) => ({ ...prev, password: event.target.value }))
-            }
           />
+          <button
+            type="button"
+            className={styles.passwordToggle}
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? "Hide" : "Show"}
+          </button>
         </div>
-        <button className={formStyles.button} type="submit" disabled={state.loading}>
-          {state.loading ? 'Signing you in…' : 'Sign in'}
+        
+        <div className={styles.forgotPassword}>
+          <Link href="/forgot-password">
+            Forgot password?
+          </Link>
+        </div>
+
+        <div className={styles.checkbox}>
+          <input
+            type="checkbox"
+            id="remember"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+          />
+          <label htmlFor="remember">Remember me</label>
+        </div>
+
+        {error && (
+          <div style={{ color: 'var(--error-red)', marginBottom: '16px', fontSize: '14px' }}>
+            {error}
+          </div>
+        )}
+
+        <button type="submit" className={styles.button} disabled={loading}>
+          {loading ? 'Signing in...' : 'Login'}
         </button>
-        <div className={formStyles.linkRow}>
-          <Link href="/signup">Create account</Link>
-          <Link href="/forgot-password">Forgot password?</Link>
+
+        <div className={styles.linkText}>
+          Not a member? <Link href="/signup">Sign up here</Link>
         </div>
-        {state.error ? <div className={formStyles.warning}>{state.error}</div> : null}
       </form>
     </AuthLayout>
   );

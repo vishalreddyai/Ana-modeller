@@ -1,7 +1,7 @@
 import { InputHTMLAttributes } from 'react';
 import styles from '../styles/FormControls.module.css';
 
-interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
+interface TextFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'className'> {
   label: string;
   error?: string;
 }
@@ -10,10 +10,12 @@ export function TextField({ label, error, id, ...props }: TextFieldProps) {
   const inputId = id ?? props.name;
 
   return (
-    <label className={styles.field} htmlFor={inputId}>
-      <span className={styles.label}>{label}</span>
+    <div className={styles.formControl}>
+      <label htmlFor={inputId} className={styles.label}>
+        {label}
+      </label>
       <input id={inputId} className={styles.input} {...props} />
-      {error ? <span className={styles.error}>{error}</span> : null}
-    </label>
+      {error && <div className={styles.error}>{error}</div>}
+    </div>
   );
 }

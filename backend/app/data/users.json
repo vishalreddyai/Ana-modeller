@@ -1,0 +1,16 @@
+{
+    "users": [
+        {
+            "id": "b663e366-d62a-46cc-aa07-ec67cb40b55a",
+            "email": "Vishal.Reddy@auxoai.com",
+            "username": "test demo",
+            "password": "1234567890"
+        },
+        {
+            "id": "46bb00d7-1dda-4559-b280-22338a017c93",
+            "email": "demo@gmail.com",
+            "username": "test demo",
+            "password": "123456789"
+        }
+    ]
+}

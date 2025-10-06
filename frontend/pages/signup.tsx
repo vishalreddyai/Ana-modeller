@@ -43,8 +43,20 @@ export default function SignupPage() {
 
     setState((prev) => ({ ...prev, loading: true, error: null, success: null }));
 
+    // Basic client-side email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(state.email)) {
+      setState((prev) => ({
+        ...prev,
+        error: 'Please enter a valid email address.',
+        success: null,
+        loading: false
+      }));
+      return;
+    }
+
     try {
-      await signup(state.fullName, state.email, state.password);
+      await signup(state.email, state.fullName, state.password);
       setState((prev) => ({
         ...prev,
         loading: false,
@@ -60,7 +72,9 @@ export default function SignupPage() {
   };
 
   return (
-    <AuthLayout title="Create your account" subtitle="Get started with Ana Modeller in minutes.">
+    <AuthLayout>
+      <h2 style={{ marginBottom: '24px', fontSize: '24px', color: 'var(--primary-text)' }}>Create your account</h2>
+      <p style={{ marginBottom: '24px', fontSize: '16px', color: 'var(--secondary-text)' }}>Get started with Ana Modeller in minutes.</p>
       <form onSubmit={handleSubmit} className={formStyles.form}>
         <div className={formStyles.stack}>
           <TextField
@@ -109,7 +123,7 @@ export default function SignupPage() {
         <button className={formStyles.button} type="submit" disabled={state.loading}>
           {state.loading ? 'Creating your account…' : 'Create account'}
         </button>
-        <div className={formStyles.linkRow}>
+        <div className={formStyles.linkText}>
           <span>
             Already have an account? <Link href="/">Sign in</Link>
           </span>

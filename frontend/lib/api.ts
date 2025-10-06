@@ -14,37 +14,34 @@ async function handleResponse<T>(response: Response): Promise<T> {
 }
 
 export async function login(email: string, password: string) {
-  return handleResponse(
-    fetch(`${API_BASE_URL}/api/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email, password })
-    })
-  );
+  const response = await fetch(`${API_BASE_URL}/api/auth/signin`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ email, password })
+  });
+  return handleResponse(response);
 }
 
-export async function signup(fullName: string, email: string, password: string) {
-  return handleResponse(
-    fetch(`${API_BASE_URL}/api/auth/signup`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ full_name: fullName, email, password })
-    })
-  );
+export async function signup(email: string, username: string, password: string) {
+  const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ email, username, password })
+  });
+  return handleResponse(response);
 }
 
 export async function forgotPassword(email: string) {
-  return handleResponse(
-    fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email })
-    })
-  );
+  const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ email })
+  });
+  return handleResponse(response);
 }
