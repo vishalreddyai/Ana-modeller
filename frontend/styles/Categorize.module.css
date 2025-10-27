@@ -1,0 +1,396 @@
+.container {
+  min-height: 100vh;
+  background-color: var(--white);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 48px;
+  border-bottom: 1px solid #E5E7EB;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--primary-text);
+  gap: 8px;
+}
+
+.logoIcon {
+  background-color: var(--primary-green);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.breadcrumb {
+  font-size: 13px;
+  color: var(--secondary-text);
+}
+
+.steps {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--secondary-text);
+  font-size: 14px;
+  opacity: 0.5;
+}
+
+.step.active {
+  opacity: 1;
+  color: var(--primary-green);
+  font-weight: 500;
+}
+
+.stepNumber {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #F3F4F6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.step.active .stepNumber {
+  background-color: var(--primary-green);
+  color: white;
+}
+
+.main {
+  flex: 1;
+  padding: 48px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 48px;
+  font-size: 18px;
+  color: var(--secondary-text);
+}
+
+.error {
+  color: var(--error-red);
+}
+
+.titleBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--primary-text);
+  margin: 0;
+}
+
+.autoCategorize {
+  padding: 10px 20px;
+  background-color: white;
+  border: 1px solid var(--primary-green);
+  border-radius: 6px;
+  color: var(--primary-green);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.autoCategorize:hover:not(:disabled) {
+  background-color: #F0FDF4;
+}
+
+.autoCategorize:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.errorBanner {
+  background-color: #FEF3C7;
+  border-left: 4px solid #F59E0B;
+  padding: 16px;
+  margin-bottom: 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #92400E;
+}
+
+.errorBanner ul {
+  margin: 8px 0 0 0;
+  padding-left: 20px;
+}
+
+.errorBanner li {
+  margin: 4px 0;
+}
+
+.tableSection {
+  background-color: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.tableHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.tableTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--primary-text);
+  margin: 0;
+}
+
+.tableActions {
+  display: flex;
+  gap: 12px;
+}
+
+.editButton, .exportButton {
+  padding: 8px 16px;
+  background-color: white;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--primary-text);
+}
+
+.editButton:hover, .exportButton:hover {
+  background-color: var(--light-gray);
+}
+
+.exportButton {
+  background-color: var(--primary-green);
+  color: white;
+  border-color: var(--primary-green);
+}
+
+.exportButton:hover {
+  background-color: #00B85A;
+}
+
+.tableContainer {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #E5E7EB;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+.table thead {
+  background-color: var(--light-gray);
+}
+
+.table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary-text);
+  border-bottom: 2px solid #E5E7EB;
+}
+
+.table tbody tr {
+  border-bottom: 1px solid #E5E7EB;
+  transition: background-color 0.2s;
+}
+
+.table tbody tr:hover {
+  background-color: #F9FAFB;
+}
+
+.table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.table td {
+  padding: 16px;
+  font-size: 14px;
+  color: var(--primary-text);
+  vertical-align: top;
+}
+
+.table td:first-child {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.table td:last-child {
+  max-width: 400px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.badge.input {
+  background-color: #DBEAFE;
+  color: #1E40AF;
+}
+
+.badge.output {
+  background-color: #D1FAE5;
+  color: #065F46;
+}
+
+.badge.system {
+  background-color: #E0E7FF;
+  color: #3730A3;
+}
+
+.badge.calculation {
+  background-color: #FEF3C7;
+  color: #92400E;
+}
+
+.badge.data {
+  background-color: #FCE7F3;
+  color: #831843;
+}
+
+.personaBadge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  background-color: #F3E8FF;
+  color: #6B21A8;
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 1px solid #E5E7EB;
+}
+
+.backButton {
+  padding: 12px 32px;
+  background-color: white;
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+  color: var(--primary-text);
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  display: inline-block;
+}
+
+.backButton:hover {
+  background-color: var(--light-gray);
+}
+
+.nextButton {
+  padding: 14px 48px;
+  background-color: var(--primary-green);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nextButton:hover {
+  background-color: #00B85A;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 210, 106, 0.3);
+}
+
+@media (max-width: 1024px) {
+  .tableActions {
+    flex-direction: column;
+  }
+  
+  .table td:last-child {
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px 24px;
+  }
+  
+  .steps {
+    gap: 16px;
+    font-size: 12px;
+  }
+  
+  .main {
+    padding: 24px;
+  }
+  
+  .titleBar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .tableContainer {
+    overflow-x: scroll;
+  }
+  
+  .actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .backButton, .nextButton {
+    width: 100%;
+    text-align: center;
+  }
+}

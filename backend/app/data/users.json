@@ -1,16 +1,30 @@
 {
     "users": [
         {
-            "id": "b663e366-d62a-46cc-aa07-ec67cb40b55a",
-            "email": "Vishal.Reddy@auxoai.com",
+            "id": "57049860-bd99-4917-aa47-7da412f454c1",
+            "email": "test@gmail.com",
             "username": "test demo",
-            "password": "1234567890"
+            "password": "$2b$12$51PuV367DaqQbFwIxBuSZewxnCZB5c5lEhstyyNiPO8paU.IU.6jy",
+            "is_active": true,
+            "is_verified": false,
+            "created_at": "2025-10-07T14:10:15.760507",
+            "updated_at": "2025-10-07T14:10:15.760507",
+            "last_login": "2025-10-27T07:28:12.018160",
+            "failed_login_attempts": 0,
+            "account_locked_until": null
         },
         {
-            "id": "46bb00d7-1dda-4559-b280-22338a017c93",
+            "id": "35beaf36-4e2c-44e5-bf34-d7b0b18d3b2a",
             "email": "demo@gmail.com",
             "username": "test demo",
-            "password": "123456789"
+            "password": "$2b$12$CzHFITfSmwIbWlHJ/J./NOTHv0Crf2yUXnldOl8NUy.tWE1yv9mVK",
+            "is_active": true,
+            "is_verified": false,
+            "created_at": "2025-10-27T07:14:53.017535",
+            "updated_at": "2025-10-27T07:14:53.017535",
+            "last_login": "2025-10-27T07:27:36.113275",
+            "failed_login_attempts": 0,
+            "account_locked_until": null
         }
     ]
 }

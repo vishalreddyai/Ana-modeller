@@ -19,7 +19,9 @@ export default function HomePage() {
             visualisations, predictive models, and collaborative workflows.
           </p>
           <div className={styles.actions}>
-            <button type="button">Create new model</button>
+            <Link href="/upload">
+              <button type="button">📁 Upload User Stories</button>
+            </Link>
             <button type="button" className={styles.secondary}>
               View reports
             </button>

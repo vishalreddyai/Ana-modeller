@@ -17,15 +17,20 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!email || !password) {
+      setError('Please enter both email and password.');
+      return;
+    }
+
     setError('');
     setLoading(true);
 
     try {
-      const data = await login(email, password);
-      localStorage.setItem('user', JSON.stringify(data));
+      await login(email, password);
       router.push('/home');
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Login failed';
+      const message = err instanceof Error ? err.message : 'Login failed. Please check your credentials.';
       setError(message);
     } finally {
       setLoading(false);
