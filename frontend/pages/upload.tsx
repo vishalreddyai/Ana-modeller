@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { uploadAndProcessUserStories, ProcessingResult } from '../lib/api';
+import { uploadAndProcessUserStories, uploadUserStories, UploadResponse } from '../lib/api';
 import styles from '../styles/Upload.module.css';
 
 export default function UploadPage() {
@@ -9,8 +9,9 @@ export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [processing, setProcessing] = useState(false);
   const [error, setError] = useState('');
-  const [uploadInfo, setUploadInfo] = useState<any>(null);
+  const [uploadInfo, setUploadInfo] = useState<UploadResponse | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDrag = (e: React.DragEvent) => {
@@ -62,7 +63,7 @@ export default function UploadPage() {
     }
   };
 
-  const handleUploadAndProcess = async () => {
+  const handleUpload = async () => {
     if (!file) {
       setError('Please select a file first');
       return;
@@ -72,11 +73,8 @@ export default function UploadPage() {
     setError('');
 
     try {
-      const result = await uploadAndProcessUserStories(file);
-      
-      // Store result in sessionStorage and navigate to categorization page
-      sessionStorage.setItem('processingResult', JSON.stringify(result));
-      router.push('/categorize');
+      const resp = await uploadUserStories(file);
+      setUploadInfo(resp);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Upload failed. Please try again.';
       setError(message);
@@ -85,13 +83,32 @@ export default function UploadPage() {
     }
   };
 
+  const handleProceed = async () => {
+    if (!file) {
+      setError('Please select and upload a file first');
+      return;
+    }
+    setProcessing(true);
+    setError('');
+    try {
+      const result = await uploadAndProcessUserStories(file);
+      sessionStorage.setItem('processingResult', JSON.stringify(result));
+      router.push('/categorize');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Processing failed. Please try again.';
+      setError(message);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   return (
     <div className={styles.container}>
       {/* Header */}
       <div className={styles.header}>
-        <div className={styles.logo}>
+        <Link href="/home" className={styles.logo}>
           <span className={styles.logoIcon}>Ana</span> Ana Designer
-        </div>
+        </Link>
         <div className={styles.steps}>
           <div className={`${styles.step} ${styles.active}`}>
             <div className={styles.stepNumber}>1</div>
@@ -118,87 +135,124 @@ export default function UploadPage() {
       {/* Main Content */}
       <div className={styles.main}>
         <div className={styles.content}>
-          <h1 className={styles.title}>Add User Stories</h1>
-          <p className={styles.subtitle}>Supports ~200-300 stories</p>
+          <div className={styles.uploadCard}>
+            <h1 className={styles.title}>Add User Stories</h1>
+            <p className={styles.subtitle}>Supports ~200-300 stories</p>
 
-          {/* Upload Area */}
-          <div
-            className={`${styles.uploadArea} ${dragActive ? styles.dragActive : ''} ${file ? styles.hasFile : ''}`}
-            onDragEnter={handleDrag}
-            onDragLeave={handleDrag}
-            onDragOver={handleDrag}
-            onDrop={handleDrop}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".xlsx,.xls,.docx,.pdf,.csv"
-              onChange={handleFileInputChange}
-              style={{ display: 'none' }}
-            />
-            
-            <div className={styles.uploadIcon}>↑</div>
-            
-            {file ? (
-              <div className={styles.fileInfo}>
-                <div className={styles.fileName}>{file.name}</div>
-                <div className={styles.fileSize}>
-                  {(file.size / 1024).toFixed(2)} KB
-                </div>
-              </div>
-            ) : (
-              <>
-                <div className={styles.uploadText}>Drag & drop files here</div>
-                <div className={styles.uploadSubtext}>CSV, Word, Excel or PDF</div>
-              </>
-            )}
-            
-            <button className={styles.chooseButton} onClick={(e) => {
-              e.stopPropagation();
-              fileInputRef.current?.click();
-            }}>
-              📎 Choose File
-            </button>
-            
-            <a href="#" className={styles.downloadSample}>Download sample</a>
-          </div>
-
-          <div className={styles.validation}>
-            <small>Validation: Max 10MB • Required: Story No, Description</small>
-          </div>
-
-          {error && (
-            <div className={styles.error}>{error}</div>
-          )}
-
-          {/* Action Buttons */}
-          <div className={styles.actions}>
-            <button
-              className={styles.uploadButton}
-              onClick={handleUploadAndProcess}
-              disabled={!file || uploading}
+            {/* Upload Area */}
+            <div
+              className={`${styles.uploadArea} ${dragActive ? styles.dragActive : ''} ${file ? styles.hasFile : ''}`}
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
+              onDragOver={handleDrag}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
             >
-              {uploading ? 'Processing...' : 'Upload & Proceed'}
-            </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".xlsx,.xls,.docx,.pdf,.csv"
+                onChange={handleFileInputChange}
+                style={{ display: 'none' }}
+              />
+              
+              <div className={styles.uploadIcon}>↑</div>
+              
+              {file ? (
+                <div className={styles.fileInfo}>
+                  <div className={styles.fileName}>{file.name}</div>
+                  <div className={styles.fileSize}>
+                    {(file.size / 1024).toFixed(2)} KB
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className={styles.uploadText}>Drag & drop files here</div>
+                  <div className={styles.uploadSubtext}>CSV, Word, Excel or PDF</div>
+                </>
+              )}
+              
+              <button className={styles.chooseButton} onClick={(e) => {
+                e.stopPropagation();
+                fileInputRef.current?.click();
+              }}>
+                📎 Choose File
+              </button>
+              
+              <a href="#" className={styles.downloadSample}>Download sample</a>
+            </div>
+
+            <div className={styles.validation}>
+              <small>Validation: Max 10MB • Required: Story No, Description</small>
+            </div>
+
+            {error && (
+              <div className={styles.error}>{error}</div>
+            )}
+
+            {/* Action Buttons */}
+            <div className={styles.actions}>
+              <button
+                className={styles.uploadButton}
+                onClick={handleUpload}
+                disabled={!file || uploading}
+              >
+                {uploading ? 'Uploading...' : 'Upload'}
+              </button>
+            </div>
           </div>
         </div>
-
         {/* Preview Panel */}
-        {file && (
-          <div className={styles.preview}>
-            <h3>Upload Preview</h3>
-            <div className={styles.previewStats}>
-              <div className={styles.stat}>
-                <div className={styles.statLabel}>Selected File</div>
-                <div className={styles.statValue}>{file.name}</div>
+        <div className={styles.preview}>
+          <h3>Upload Preview</h3>
+          {uploadInfo ? (
+            <>
+              <div className={styles.previewHeaderRow}>
+                <div className={styles.previewStatBox}>
+                  <div className={styles.statLabel}>Total</div>
+                  <div className={styles.statBig}>{uploadInfo.total_stories}</div>
+                </div>
+                <div className={styles.previewStatBox}>
+                  <div className={styles.statLabel}>Valid</div>
+                  <div className={styles.statBig}>{uploadInfo.valid_stories}</div>
+                </div>
+                <div className={styles.previewStatBox}>
+                  <div className={styles.statLabel}>Duplicates</div>
+                  <div className={styles.statBig}>{uploadInfo.duplicates}</div>
+                </div>
+                <div className={styles.previewStatBox}>
+                  <div className={styles.statLabel}>Errors</div>
+                  <div className={styles.statBig}>{uploadInfo.errors}</div>
+                </div>
               </div>
-            </div>
-            <p className={styles.previewNote}>
-              Full details available in Categorize step
-            </p>
-          </div>
-        )}
+
+              <div className={styles.previewTable}>
+                <div className={styles.tableHeader}>
+                  <div className={styles.colUst}>UST</div>
+                  <div className={styles.colDesc}>Description</div>
+                </div>
+                {uploadInfo.preview.map((row, idx) => (
+                  <div key={idx} className={styles.tableRow}>
+                    <div className={styles.colUst}>{row.ust}</div>
+                    <div className={styles.colDesc}>{row.description}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div className={styles.previewActions}>
+                <button
+                  className={styles.proceedButton}
+                  onClick={handleProceed}
+                  disabled={processing}
+                >
+                  {processing ? 'Processing...' : 'Proceed'}
+                </button>
+              </div>
+            </>
+          ) : (
+            <p className={styles.previewNote}>Upload a file to see a preview.</p>
+          )}
+        </div>
       </div>
     </div>
   );

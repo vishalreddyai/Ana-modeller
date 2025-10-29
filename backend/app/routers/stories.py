@@ -34,13 +34,8 @@ async def upload_user_stories(file: UploadFile = File(...)):
         # Validate stories
         validation_result = excel_parser.validate_user_stories(user_stories)
         
-        # Create preview (first 5 stories)
-        preview = []
-        for story in validation_result['valid'][:5]:
-            preview.append({
-                'ust': story['story_no'],
-                'description': story['user_story'] or story['title']
-            })
+        # Create preview for all valid stories using LLM
+        preview = await llm_service.generate_preview(validation_result['valid'])
         
         # Store in cache for processing
         cache_key = file.filename or 'uploaded_file'

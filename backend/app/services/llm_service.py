@@ -88,6 +88,76 @@ Be concise and specific in your descriptions."""
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Error categorizing user stories: {str(e)}"
             )
+
+    async def generate_preview(self, user_stories: List[Dict[str, Any]]) -> List[Dict[str, str]]:
+        """Generate concise preview rows for all user stories via LLM.
+
+        Output format for each row: {"ust": "US-001", "description": "..."}
+        When LLM is not configured, fall back to a deterministic preview using
+        user_story/title truncated text.
+        """
+        if not self.client:
+            # Fallback: basic preview from provided fields
+            preview: List[Dict[str, str]] = []
+            for story in user_stories:
+                desc = story.get('user_story') or story.get('title') or ''
+                desc = (desc[:200] + '…') if len(desc) > 200 else desc
+                preview.append({
+                    'ust': story.get('story_no') or story.get('ust') or 'N/A',
+                    'description': desc
+                })
+            return preview
+
+        # Build a single prompt asking the model to produce JSON array of rows
+        try:
+            bullets = []
+            for s in user_stories:
+                bullets.append(
+                    f"UST: {s.get('story_no')}\nTitle: {s.get('title','')}\nUser Story: {s.get('user_story','')}\nAcceptance Criteria: {s.get('acceptance_criteria','')}"
+                )
+            user_content = (
+                "You are to produce a JSON array named preview where each element has keys 'ust' and 'description'.\n"
+                "Use the given user stories and write a clear single-sentence description per row.\n"
+                "Return ONLY the JSON array without any extra text.\n\n" + "\n\n".join(bullets)
+            )
+
+            chat_completion = self.client.chat.completions.create(
+                messages=[
+                    {"role": "system", "content": "You generate concise preview tables for user stories. Output JSON array with objects: {ust, description}."},
+                    {"role": "user", "content": user_content},
+                ],
+                model=self.model,
+                temperature=0.2,
+                max_tokens=2000,
+                response_format={"type": "json_object"}
+            )
+
+            response_text = chat_completion.choices[0].message.content
+            data = json.loads(response_text)
+            # Accept either {preview: [...]} or a raw array
+            if isinstance(data, dict) and 'preview' in data:
+                arr = data['preview']
+            else:
+                arr = data
+            # Validate shape minimally
+            preview_rows: List[Dict[str, str]] = []
+            for row in arr:
+                ust = str(row.get('ust', 'N/A'))
+                desc = str(row.get('description', ''))
+                preview_rows.append({'ust': ust, 'description': desc})
+            return preview_rows
+        except Exception as e:
+            # Fallback to simple preview if LLM fails
+            print(f"LLM preview failed, using fallback: {e}")
+            preview: List[Dict[str, str]] = []
+            for story in user_stories:
+                desc = story.get('user_story') or story.get('title') or ''
+                desc = (desc[:200] + '…') if len(desc) > 200 else desc
+                preview.append({
+                    'ust': story.get('story_no') or story.get('ust') or 'N/A',
+                    'description': desc
+                })
+            return preview
     
     async def _categorize_single_story(self, story: Dict[str, Any]) -> Dict[str, str]:
         """Categorize a single user story"""

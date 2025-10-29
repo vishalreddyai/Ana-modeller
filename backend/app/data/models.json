@@ -1,0 +1,12 @@
+{
+    "models": [
+        {
+            "id": "b98b41ce-8017-42b0-87d3-fc419c8d885d",
+            "name": "supplychain",
+            "description": null,
+            "user_id": "57049860-bd99-4917-aa47-7da412f454c1",
+            "created_at": "2025-10-27T14:43:19.698986",
+            "updated_at": "2025-10-27T14:43:19.698986"
+        }
+    ]
+}

@@ -1,47 +1,54 @@
-import Link from 'next/link';
-
-import styles from '../styles/HomePage.module.css';
+import { AppLayout } from '../components/AppLayout';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 
 export default function HomePage() {
+  const [username, setUsername] = useState('User');
+  const [userId, setUserId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    // This effect runs only on the client side
+    if (typeof window !== 'undefined') {
+      const userData = localStorage.getItem('user');
+      
+      if (!userData) {
+        // If no user data, redirect to login
+        router.push('/');
+        return;
+      }
+
+      try {
+        const user = JSON.parse(userData);
+        setUsername(user.name || user.email?.split('@')[0] || 'User');
+        setUserId(user.id ?? null);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        router.push('/');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  }, [router]);
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        backgroundColor: '#f9fafb',
+      }}>
+        <div>Loading...</div>
+      </div>
+    );
+  }
+
   return (
-    <div className={styles.wrapper}>
-      <header className={styles.navbar}>
-        <div className={styles.brand}>Ana Modeller</div>
-        <nav>
-          <Link href="/">Sign out</Link>
-        </nav>
-      </header>
-      <main className={styles.content}>
-        <section className={styles.hero}>
-          <h1>Welcome to your analytics hub</h1>
-          <p>
-            You are now signed in. This dashboard is ready for integration with your data
-            visualisations, predictive models, and collaborative workflows.
-          </p>
-          <div className={styles.actions}>
-            <Link href="/upload">
-              <button type="button">📁 Upload User Stories</button>
-            </Link>
-            <button type="button" className={styles.secondary}>
-              View reports
-            </button>
-          </div>
-        </section>
-        <section className={styles.tiles}>
-          <article>
-            <h2>Pipeline status</h2>
-            <p>All data ingestion pipelines are running smoothly.</p>
-          </article>
-          <article>
-            <h2>Recent activity</h2>
-            <p>Track who viewed, edited, and deployed your models in real-time.</p>
-          </article>
-          <article>
-            <h2>Next actions</h2>
-            <p>Assign tasks, manage approvals, and keep delivery on track.</p>
-          </article>
-        </section>
-      </main>
-    </div>
+    <AppLayout username={username} userId={userId} />
   );
 }
+

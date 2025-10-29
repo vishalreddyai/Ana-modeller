@@ -13,6 +13,21 @@ export interface ApiError {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000';
 
+export interface AppModel {
+  id: string;
+  name: string;
+  description?: string | null;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateModelPayload {
+  name: string;
+  user_id: string;
+  description?: string;
+}
+
 async function apiClient<T>(
   endpoint: string,
   options: RequestInit = {}
@@ -42,24 +57,65 @@ async function apiClient<T>(
   return response.json();
 }
 
-export function login(email: string, password: string): Promise<User> {
-  return apiClient<User>('/api/auth/signin', {
-    method: 'POST',
-    body: JSON.stringify({ email, password }),
-  });
+export async function login(email: string, password: string): Promise<User> {
+  try {
+    const user = await apiClient<User>('/api/auth/signin', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+    
+    // Store user data in localStorage
+    localStorage.setItem('user', JSON.stringify({
+      id: user.id,
+      email: user.email,
+      name: user.username || email.split('@')[0],
+      token: user.token
+    }));
+    
+    return user;
+  } catch (error) {
+    console.error('Login failed:', error);
+    throw error;
+  }
 }
 
-export function signup(email: string, username: string, password: string): Promise<User> {
-  return apiClient<User>('/api/auth/signup', {
-    method: 'POST',
-    body: JSON.stringify({ email, username, password }),
-  });
+export async function signup(email: string, username: string, password: string): Promise<User> {
+  try {
+    const user = await apiClient<User>('/api/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify({ email, username, password }),
+    });
+    
+    // Store user data in localStorage
+    localStorage.setItem('user', JSON.stringify({
+      id: user.id,
+      email: user.email,
+      name: user.username || email.split('@')[0],
+      token: user.token
+    }));
+    
+    return user;
+  } catch (error) {
+    console.error('Signup failed:', error);
+    throw error;
+  }
 }
 
 export function forgotPassword(email: string): Promise<{ message: string }> {
   return apiClient<{ message: string }>('/api/auth/forgot-password', {
     method: 'POST',
     body: JSON.stringify({ email }),
+  });
+}
+
+export function fetchModels(userId: string): Promise<AppModel[]> {
+  return apiClient<AppModel[]>(`/api/models?user_id=${encodeURIComponent(userId)}`);
+}
+
+export function createModel(payload: CreateModelPayload): Promise<AppModel> {
+  return apiClient<AppModel>('/api/models', {
+    method: 'POST',
+    body: JSON.stringify(payload),
   });
 }
 

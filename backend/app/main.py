@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
 # Import routers
-from app.routers import auth, stories
+from app.routers import auth, stories, models
 
 # Create FastAPI application instance
 app = FastAPI(
@@ -34,6 +34,7 @@ app.add_middleware(
 # Include API routers
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(stories.router, prefix="/api/stories", tags=["User Stories"])
+app.include_router(models.router, prefix="/api/models", tags=["Models"])
 
 # Health check endpoint
 @app.get("/api/health")

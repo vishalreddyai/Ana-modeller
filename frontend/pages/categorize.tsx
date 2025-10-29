@@ -37,7 +37,7 @@ export default function CategorizePage() {
     
     // Create CSV content
     const headers = type === 'disco' 
-      ? ['Story No', 'Category (DISCO)', 'Description']
+      ? ['UST', 'Category (DISCO)', 'Description']
       : ['UST', 'Persona', 'Description'];
     
     const csvContent = [
@@ -161,7 +161,7 @@ export default function CategorizePage() {
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>Story No</th>
+                  <th>UST</th>
                   <th>Category (DISCO)</th>
                   <th>Description</th>
                 </tr>
